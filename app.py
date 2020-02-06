@@ -11,30 +11,20 @@ import matplotlib.pyplot as plt
 import io, base64
 
 
-DB = SQLAlchemy()
+
 
 songs = pd.read_csv('SpotifyAudioFeaturesApril2019.csv')
+songs.drop_duplicates(['track_id'],inplace=True)
+
 features = ['valence','speechiness','liveness','instrumentalness',
             'energy','danceability','acousticness']
-
-# pickle_path = 'nn_base.pkl'
-# with open(pickle_path,'rb') as f:
-#     model = pickle.load(f)
-
-features = ['valence','speechiness','liveness','instrumentalness','energy','danceability','acousticness']
 song_features = songs[features]
+
 nn = NearestNeighbors(n_neighbors=30)
 nn.fit(song_features)
 
-conn = sqlite3.connect('songs_df.sqlite3')
-songs.drop_duplicates(['track_id'],inplace=True)
-songs.to_sql('songs', conn, if_exists='replace')
-# from model.py import track_ids
 
 app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///songs_df.sqlite3'
-db = SQLAlchemy(app)
 
 def encoded_img(df,track_id,features):
     """
@@ -96,24 +86,26 @@ def processjson():
     # arrays will be converted input_data = to a list
     track_id = request.get_json(force=True)
     print(track_id)
-    # recieved_id = data[0]
-    song = songs[songs["track_id"] == track_id["track_id"]].iloc[0] # Get Song
-    songs_selected = songs.copy()
 
-    #nn = model # Nearest Neighbor Model
-    #np array
+    # The request from BE is going to contain a Json
+    # object with the format {"track_id":"0M5gFT4YDJv5uiqRB2CEvF"}
+    # The key to check from the dictionary is "track_id"
 
+    # Get Song
+    song = songs[songs["track_id"] == track_id["track_id"]].iloc[0]
+
+    # Convert the song data into a format that the nn model understands
     song = np.array(song[features]).reshape(1, -1)
     results = nn.kneighbors(song)
 
     track_ids = []
     for i in results[1][0]:
         track_ids.append(songs['track_id'].iloc[i])
+    # Print(track_ids)
 
-    #print(track_ids)
-
+    # Get the string that encodes the image from the encode_img function
     img = encoded_img(songs, track_id["track_id"], features)
 
-
     return jsonify({'track_ids': track_ids, 'img': img})
-    # return jsonify({'track_ids': track_ids})
+    # return JSON object
+    # {'track_ids': [List of track ids],"img":[String with encoded image data]]}
