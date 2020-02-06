@@ -38,17 +38,17 @@ db = SQLAlchemy(app)
 
 def encoded_img(df,track_id,features):
     """
-    Function that generates image data in binary64 format to return to 
+    Function that generates image data in binary64 format to return to
     the backend when they request a list of suggested songs
-    
-    The image is a radarchart that displays the features of the 
+
+    The image is a radarchart that displays the features of the
     requested song.
-    
-    df = song dataframe with all the information in it 
+
+    df = song dataframe with all the information in it
     It must at the very least include track_id and all the features
-    
+
     features = the features that you would like plotted in the radar chart
-    
+
     track_id = track_id of the song you wish to plot
     """
     categories=features
@@ -87,7 +87,7 @@ def encoded_img(df,track_id,features):
     plt.clf()
     data = base64.b64encode(pic_bytes.read()).decode("ascii")
     img = "data:image/png;base64,{}".format(data)
-    
+
     return img
 
 @app.route('/processjson', methods=['POST'])
@@ -97,12 +97,12 @@ def processjson():
     track_id = request.get_json(force=True)
     print(track_id)
     # recieved_id = data[0]
-    song = songs[songs["track_id"] == track_id["1"]].iloc[0] # Get Song
+    song = songs[songs["track_id"] == track_id["track_id"]].iloc[0] # Get Song
     songs_selected = songs.copy()
-    
+
     #nn = model # Nearest Neighbor Model
     #np array
-    
+
     song = np.array(song[features]).reshape(1, -1)
     results = nn.kneighbors(song)
 
@@ -112,9 +112,8 @@ def processjson():
 
     #print(track_ids)
 
-    img = encoded_img(songs, track_id, features)
+    img = encoded_img(songs, track_id["track_id"], features)
 
 
     return jsonify({'track_ids': track_ids, 'img': img})
     # return jsonify({'track_ids': track_ids})
-
