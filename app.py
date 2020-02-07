@@ -103,11 +103,11 @@ def processjson():
     # for i in results[1][0]:
     #     track_ids.append(songs['track_id'].iloc[i])
 
-    track_names = []
-    artists=[]
-    for i in results[1][0]:
-        track_names.append(songs['track_name'].iloc[i])
-        artists.append(songs['artist_name'].iloc[i])
+    track_names = {}
+    artists = {}
+    for index,i in enumerate(results[1][0]):
+        track_names[str(index)] = songs['track_name'].iloc[i]
+        artists[str(index)] = songs['artist_name'].iloc[i]
     # Print(track_ids)
 
     # Get the string that encodes the image from the encode_img function
