@@ -1,15 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from sklearn.neighbors import NearestNeighbors
 import pandas as pd
-import sqlite3
 import numpy as np
 import json
 import pickle
 from math import pi
 import matplotlib.pyplot as plt
 import io, base64
-
 
 
 
@@ -25,6 +24,7 @@ nn.fit(song_features)
 
 
 app = Flask(__name__)
+CORS(app)
 
 def encoded_img(df,track_id,features):
     """
