@@ -113,6 +113,6 @@ def processjson():
     # Get the string that encodes the image from the encode_img function
     img = encoded_img(songs, track_id["track_id"], features)
 
-    return jsonify({'track_names': track_names, 'artists':artists 'img': img})
+    return jsonify({'track_names': track_names, 'artists':artists, 'img': img})
     # return JSON object
     # {'track_ids': [List of track ids],"img":[String with encoded image data]]}
