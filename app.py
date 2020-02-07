@@ -98,14 +98,21 @@ def processjson():
     song = np.array(song[features]).reshape(1, -1)
     results = nn.kneighbors(song)
 
-    track_ids = []
+    # if you want to return track id uncomment the following code
+    # track_ids = []
+    # for i in results[1][0]:
+    #     track_ids.append(songs['track_id'].iloc[i])
+
+    track_names = []
+    artists=[]
     for i in results[1][0]:
-        track_ids.append(songs['track_id'].iloc[i])
+        track_names.append(songs['track_name'].iloc[i])
+        artists.append(songs['artist_name'].iloc[i])
     # Print(track_ids)
 
     # Get the string that encodes the image from the encode_img function
     img = encoded_img(songs, track_id["track_id"], features)
 
-    return jsonify({'track_ids': track_ids, 'img': img})
+    return jsonify({'track_names': track_names, 'artists':artists 'img': img})
     # return JSON object
     # {'track_ids': [List of track ids],"img":[String with encoded image data]]}
